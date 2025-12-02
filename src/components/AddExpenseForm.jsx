@@ -38,7 +38,7 @@ const AddExpenseForm = ({ onAddExpense, categories }) => {
             <Input
                 value={expense.name}
                 onChange={({ target }) => handleChange("name", target.value)}
-                label="Income Source"
+                label="Expense Source"
                 placeholder="e.g., Electricity, Wifi"
                 type="text"
             />

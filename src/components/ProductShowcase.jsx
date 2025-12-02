@@ -7,7 +7,7 @@ const ProductShowcase = () => {
                 <img
                     src={assets.landing}
                     className="w-full h-auto object-cover rounded-lg shadow-xl"
-                    alt="MoneyWise App Dashboard"
+                    alt="Fintrack App Dashboard"
                     onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/1200x600/E2E8F0/4A5568?text=Image+Not+Found'; }}
                 />
             </div>

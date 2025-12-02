@@ -70,7 +70,7 @@ const Home = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         {/* Recent transactions */}
                         <RecentTransactions
-                            transactions={dashboardData?.recentTransactions}
+                            transactions={dashboardData?.recenTransactions}
                             onMore={() => navigate("/expense")}
                         />
 

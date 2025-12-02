@@ -1,6 +1,5 @@
-export const BASE_URL = "https://money-manager-api-youtube.onrender.com/api/v1.0";
-//export const BASE_URL = "http://localhost:8080/api/v1.0";
-const CLOUDINARY_CLOUD_NAME = "dhadf5h7j";
+export const BASE_URL = "http://localhost:8080/api";
+const CLOUDINARY_CLOUD_NAME = "da2eld3dz";
 
 export const API_ENDPOINTS = {
     LOGIN: "/login",
@@ -14,7 +13,7 @@ export const API_ENDPOINTS = {
     ADD_INCOME: "/incomes",
     DELETE_INCOME: (incomeId) => `/incomes/${incomeId}`,
     INCOME_EXCEL_DOWNLOAD: "excel/download/income",
-    EMAIL_INCOME: "/email/income-excel",
+    EMAIL_INCOME: "/email/incomeExcel",
     GET_ALL_EXPENSE: "/expenses",
     ADD_EXPENSE: "/expenses",
     DELETE_EXPENSE: (expenseId) => `/expenses/${expenseId}`,
