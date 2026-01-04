@@ -24,12 +24,12 @@ const Filter = () => {
         setLoading(true);
         try {
             const response = await axiosConfig.post(API_ENDPOINTS.APPLY_FILTERS, {
-                type,
-                startDate,
-                endDate,
-                keyword,
-                sortField,
-                sortOrder
+                 type,
+    start: startDate || null,
+    end: endDate || null,
+    keyword,
+    sortField,
+    sortOrder
             });
             console.log('transactions: ', response.data);
             setTransactions(response.data);

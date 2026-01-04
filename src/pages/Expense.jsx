@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import {useUser} from "../hooks/useUser.jsx";
+import { useUser } from "../hooks/useUser.jsx";
 import axiosConfig from "../util/axiosConfig.jsx";
-import {API_ENDPOINTS} from "../util/apiEndpoints.js";
+import { API_ENDPOINTS } from "../util/apiEndpoints.js";
 import Dashboard from "../components/Dashboard.jsx";
 import ExpenseOverview from "../components/ExpenseOverview.jsx";
 import ExpenseList from "../components/ExpenseList.jsx";
@@ -15,7 +15,7 @@ const Expense = () => {
     useUser();
     const navigate = useNavigate();
     const [expenseData, setExpenseData] = useState([]);
-    const [categories, setCategories] = useState([]); // New state for expense categories
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [openAddExpenseModal, setOpenAddExpenseModal] = useState(false);
     const [openDeleteAlert, setOpenDeleteAlert] = useState({
@@ -25,15 +25,10 @@ const Expense = () => {
 
     // Get All Expense Details
     const fetchExpenseDetails = async () => {
-        if (loading) return; // Prevent multiple fetches if already loading
-
+        if (loading) return;
         setLoading(true);
-
         try {
-            const response = await axiosConfig.get(
-                `${API_ENDPOINTS.GET_ALL_EXPENSE}`
-            );
-
+            const response = await axiosConfig.get(API_ENDPOINTS.GET_ALL_EXPENSE);
             if (response.data) {
                 setExpenseData(response.data);
             }
@@ -45,12 +40,10 @@ const Expense = () => {
         }
     };
 
-    // New: Fetch Expense Categories
+    // Fetch Expense Categories
     const fetchExpenseCategories = async () => {
         try {
-            const response = await axiosConfig.get(
-                API_ENDPOINTS.CATEGORY_BY_TYPE("expense") // Fetch categories of type 'expense'
-            );
+            const response = await axiosConfig.get(API_ENDPOINTS.CATEGORY_BY_TYPE("expense"));
             if (response.data) {
                 setCategories(response.data);
             }
@@ -60,56 +53,31 @@ const Expense = () => {
         }
     };
 
-
     // Handle Add Expense
     const handleAddExpense = async (expense) => {
-        const { name, categoryId, amount, date, icon } = expense; // Changed 'category' to 'categoryId'
+        const { name, categoryId, amount, date, icon } = expense;
 
-        if (!name.trim()) {
-            toast.error("Name is required.");
-            return;
-        }
-
-        // Validation Checks
-        if (!categoryId) { // Validate categoryId now
-            toast.error("Category is required.");
-            return;
-        }
-
-        if (!amount || isNaN(amount) || Number(amount) <= 0) {
-            toast.error("Amount should be a valid number greater than 0.");
-            return;
-        }
-
-        if (!date) {
-            toast.error("Date is required.");
-            return;
-        }
-
-        const today = new Date().toISOString().split('T')[0];
-        if (date > today) {
-            toast.error('Date cannot be in the future');
-            return;
-        }
+        if (!name.trim()) return toast.error("Name is required.");
+        if (!categoryId) return toast.error("Category is required.");
+        if (!amount || isNaN(amount) || Number(amount) <= 0) return toast.error("Amount should be a valid number greater than 0.");
+        if (!date) return toast.error("Date is required.");
+        if (date > new Date().toISOString().split('T')[0]) return toast.error('Date cannot be in the future');
 
         try {
             await axiosConfig.post(API_ENDPOINTS.ADD_EXPENSE, {
                 name,
-                categoryId, // Pass categoryId to the API
-                amount: Number(amount), // Ensure amount is a number
+                categoryId,
+                amount: Number(amount),
                 date,
                 icon,
             });
 
             setOpenAddExpenseModal(false);
             toast.success("Expense added successfully");
-            fetchExpenseDetails(); // Refresh expense list
+            fetchExpenseDetails();
             fetchExpenseCategories();
         } catch (error) {
-            console.error(
-                "Error adding expense:",
-                error.response?.data?.message || error.message
-            );
+            console.error("Error adding expense:", error.response?.data?.message || error.message);
             toast.error(error.response?.data?.message || "Failed to add expense.");
         }
     };
@@ -118,41 +86,28 @@ const Expense = () => {
     const deleteExpense = async (id) => {
         try {
             await axiosConfig.delete(API_ENDPOINTS.DELETE_EXPENSE(id));
-
             setOpenDeleteAlert({ show: false, data: null });
             toast.success("Expense details deleted successfully");
             fetchExpenseDetails();
         } catch (error) {
-            console.error(
-                "Error deleting expense:",
-                error.response?.data?.message || error.message
-            );
+            console.error("Error deleting expense:", error.response?.data?.message || error.message);
             toast.error(error.response?.data?.message || "Failed to delete expense.");
         }
     };
 
+    // Download Expense Details
     const handleDownloadExpenseDetails = async () => {
         try {
-            const response = await axiosConfig.get(
-                API_ENDPOINTS.EXPENSE_EXCEL_DOWNLOAD, // Ensure this path is correct, e.g., "/download/income"
-                {
-                    responseType: "blob", // Important: tells Axios to expect binary data
-                }
-            );
-
-            // Extract filename from Content-Disposition header, or use a default
-            let filename = "expense_details.xlsx"; // Default filename
-
-            // Create a URL for the blob
+            const response = await axiosConfig.get(API_ENDPOINTS.EXPENSE_EXCEL_DOWNLOAD, { responseType: "blob" });
+            let filename = "expense_details.xlsx";
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement("a");
             link.href = url;
-            link.setAttribute("download", filename); // Use the extracted or default filename
+            link.setAttribute("download", filename);
             document.body.appendChild(link);
-            link.click(); // Programmatically click the link to trigger download
-            link.parentNode.removeChild(link); // Clean up the link element
-            window.URL.revokeObjectURL(url); // Release the object URL
-
+            link.click();
+            link.parentNode.removeChild(link);
+            window.URL.revokeObjectURL(url);
             toast.success("Expense details downloaded successfully!");
         } catch (error) {
             console.error("Error downloading expense details:", error);
@@ -160,28 +115,16 @@ const Expense = () => {
         }
     };
 
-    const handleEmailExpenseDetails = async () => {
-        try {
-            const response = await axiosConfig.get(API_ENDPOINTS.EMAIL_EXPENSE);
-            if(response.status === 200) {
-                toast.success("Email sent");
-            }
-        }catch (e) {
-            console.error("Error emailing expense details:", e);
-            toast.error("Failed to email expense details. Please try again.");
-        }
-    }
-
     useEffect(() => {
         fetchExpenseDetails();
-        fetchExpenseCategories(); // Fetch categories when component mounts
+        fetchExpenseCategories();
     }, []);
 
     return (
         <Dashboard activeMenu="Expense">
             <div className="my-5 mx-auto">
                 <div className="grid grid-cols-1 gap-6">
-                    <div className="">
+                    <div>
                         <ExpenseOverview
                             transactions={expenseData}
                             onExpenseIncome={() => setOpenAddExpenseModal(true)}
@@ -190,11 +133,9 @@ const Expense = () => {
 
                     <ExpenseList
                         transactions={expenseData}
-                        onDelete={(id) => {
-                            setOpenDeleteAlert({ show: true, data: id });
-                        }}
+                        onDelete={(id) => setOpenDeleteAlert({ show: true, data: id })}
                         onDownload={handleDownloadExpenseDetails}
-                        onEmail={handleEmailExpenseDetails}
+                        // Removed onEmail prop
                     />
 
                     <Modal
@@ -202,10 +143,9 @@ const Expense = () => {
                         onClose={() => setOpenAddExpenseModal(false)}
                         title="Add Expense"
                     >
-                        {/* Pass the fetched expense categories to the AddExpenseForm */}
                         <AddExpenseForm
                             onAddExpense={handleAddExpense}
-                            categories={categories} // Pass categories here
+                            categories={categories}
                         />
                     </Modal>
 
