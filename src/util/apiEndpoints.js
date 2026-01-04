@@ -1,4 +1,4 @@
-export const BASE_URL = "http://localhost:8080/api";
+export const BASE_URL = "https://moneymanagerbackend-9ava.onrender.com/api";
 const CLOUDINARY_CLOUD_NAME = "da2eld3dz";
 
 export const API_ENDPOINTS = {
